@@ -6,6 +6,8 @@ import HistoryFinanceCard from "../../Components/HistoryFinanceCard";
 import { useParams } from "react-router-dom";
 import gains from "../../repositories/gains";
 import expenses from "../../repositories/expenses";
+import formatCurrency from "../../utils/formatCurrency"; 
+import formatDate from "../../utils/formatDate";
 
 interface IData {
   id: string;
@@ -19,6 +21,8 @@ interface IData {
 const List : React.FC = () => {
   const [data, setData] = useState<IData[]>([]);
   const { type } = useParams<{type: string}>();
+  const [monthSelected, setMonthSelected] = useState<string>(String(new Date().getMonth() + 1));
+  const [yearSelected, setYearSelected] = useState<string>(String(new Date().getFullYear()));
   
   const prop = useMemo(() => {
       return type === "entry-balance" ? {
@@ -36,36 +40,49 @@ const List : React.FC = () => {
     },[type])
 
     const months =[
-        {value : 7, label : 'Julho'},
-        {value : 8, label : 'Agosto'},
-        {value : 9, label : 'Setembro'}
+        {value : 1, label : 'Janeiro'},
+        {value : 5, label : 'Maio'},
+        {value : 3, label : 'Março'}
     ]
 
     const years =[
       {value : 2020, label : 2020},
       {value : 2019, label : 2019},
-      {value : 2018, label : 2018}
+      {value : 2024, label : 2024}
     ]
 
+
     useEffect(() => {
-      const response = listData.map(item => {
-         return {
-              id: String(Math.random() * data.length),
+
+      const filteredData = listData.filter(item => {
+
+         const date = new Date(item.date); 
+                  
+         const month = String(date.getMonth() + 1);
+         const year = String(date.getFullYear());
+
+         return month === monthSelected && year === yearSelected;
+      });
+
+      const formattedData = filteredData.map(item => {
+          return {
+              id: String(new Date().getTime()) + item.amount,
               description: item.description,
-              amountFormatted: item.amount,
+              amountFormatted: formatCurrency(Number(item.amount)),
               frquency: item.frequency,
-              dateFormatted: item.date,
+              dateFormatted: formatDate(item.date),
               tagColor: item.frequency === 'recorrente'?  '#4e41f0' : '#e44c4e'
-         }
+          }
       })
-      setData(response);
-    },[])
+      
+      setData(formattedData);
+    },[listData, monthSelected, yearSelected, data.length])
 
     return (
       <Container>
           <ContentHeader title={prop.title} lineColor={prop.lineColor}>
-            <SelectInput options={months}/>
-            <SelectInput options={years}/>
+            <SelectInput options={months} onChange={(e) => setMonthSelected(e.target.value)} defaultValue={monthSelected}/>
+            <SelectInput options={years} onChange={(e) => setYearSelected(e.target.value)} defaultValue={yearSelected}/>
 
           </ContentHeader>
 
