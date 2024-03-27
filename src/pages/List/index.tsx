@@ -21,30 +21,30 @@ interface IData {
 
 const List : React.FC = () => {
   const [data, setData] = useState<IData[]>([]);
-  const { type } = useParams<{type: string}>();
-  const [monthSelected, setMonthSelected] = useState<string>(String(new Date().getMonth() + 1));
-  const [yearSelected, setYearSelected] = useState<string>(String(new Date().getFullYear()));
+  const { movimentType } = useParams<{movimentType: string}>();
+  const [monthSelected, setMonthSelected] = useState<number>(new Date().getMonth() + 1);
+  const [yearSelected, setYearSelected] = useState<number>(new Date().getFullYear());
   const [selectedFrequency, setSelectedFrequency] = useState(['recorrente','eventual']);
   
-    const prop = useMemo(() => {
-      return type === "entry-balance" ? {
+    const pageData = useMemo(() => {
+      return movimentType === 'entry-balance'?
+      {
         title: 'Entradas',
-        lineColor: '#F7931B'
-      }: {
+        lineColor: '#F7831B',
+        data: gains
+      } : 
+      {
         title: 'Saídas',
-        lineColor: '#E44C4E'
+        lineColor: '#E44C4E',
+        data: expenses
       }
 
-    },[type])
-
-    const listData = useMemo(() => {
-      return type === "entry-balance" ? gains : expenses
-    },[type])
+    },[movimentType]);
 
     const years = useMemo(() => {
       let uniqueYears: number[] = [];
-
-      listData.forEach(item => {
+      
+      pageData.data.forEach(item => {
         const date = new Date(item.date);
         const year = date.getFullYear();
 
@@ -59,7 +59,7 @@ const List : React.FC = () => {
           label: year,
         }
       })
-    },[listData]);
+    },[pageData.data]);
 
     const months = useMemo(() => {
       return listOfMonths.map((month, index) => {
@@ -84,14 +84,31 @@ const List : React.FC = () => {
       }
     }
 
+    const handleMonthSelected = (month : string) => {
+      try {
+        const parseMonth = Number(month);
+        setMonthSelected(parseMonth);        
+      } catch (error) {
+        throw new Error("Invalid month value. Is accpet 0 - 24");
+      }
+    }
+    const handleYearSelected = (year : string) => {
+      try {
+        const parseYear = Number(year);
+        setYearSelected(parseYear);    
+      } catch (error) {
+        throw new Error("Invalid year value.");
+      }
+    }
+
     useEffect(() => {
 
-      const filteredData = listData.filter(item => {
+      const filteredData = pageData.data.filter(item => {
 
          const date = new Date(item.date); 
                   
-         const month = String(date.getMonth() + 1);
-         const year = String(date.getFullYear());
+         const month = date.getMonth() + 1;
+         const year = date.getFullYear();
 
          return month === monthSelected && year === yearSelected && selectedFrequency.includes(item.frequency);
       });
@@ -108,14 +125,14 @@ const List : React.FC = () => {
       })
       
       setData(formattedData);
-    },[listData, monthSelected, yearSelected, data.length, selectedFrequency])
+    },[pageData, monthSelected, yearSelected, data.length, selectedFrequency])
     
 
     return (
       <Container>
-          <ContentHeader title={prop.title} lineColor={prop.lineColor}>
-            <SelectInput options={months} onChange={(e) => setMonthSelected(e.target.value)} defaultValue={monthSelected}/>
-            <SelectInput options={years} onChange={(e) => setYearSelected(e.target.value)} defaultValue={yearSelected}/>
+          <ContentHeader title={pageData.title} lineColor={pageData.lineColor}>
+            <SelectInput options={months} onChange={(e) => handleMonthSelected(e.target.value)} defaultValue={monthSelected}/>
+            <SelectInput options={years} onChange={(e) => handleYearSelected(e.target.value)} defaultValue={yearSelected}/>
 
           </ContentHeader>
 
