@@ -27,10 +27,11 @@ const List : React.FC = () => {
   const [selectedFrequency, setSelectedFrequency] = useState(['recorrente','eventual']);
   
     const pageData = useMemo(() => {
-      return movimentType === 'entry-balance'?
+            
+      return movimentType === "entry-balance"?
       {
         title: 'Entradas',
-        lineColor: '#F7831B',
+        lineColor: '#4E41F0',
         data: gains
       } : 
       {
@@ -40,6 +41,7 @@ const List : React.FC = () => {
       }
 
     },[movimentType]);
+
 
     const years = useMemo(() => {
       let uniqueYears: number[] = [];
@@ -125,7 +127,7 @@ const List : React.FC = () => {
       })
       
       setData(formattedData);
-    },[pageData, monthSelected, yearSelected, data.length, selectedFrequency])
+    },[pageData.data, monthSelected, yearSelected, data.length, selectedFrequency])
     
 
     return (
