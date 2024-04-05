@@ -83,7 +83,7 @@ const Dashboard : React.FC = () => {
               icon="dolar"
             />
             <WalletBox
-              title="entradas"
+              title="Entradas"
               amount={5000.00}
               color = "#f7931b"
               footerlabel={"atualizado com base nas entradas e saidas"}
