@@ -4,7 +4,10 @@ import SelectInput from "../../Components/SelectInput";
 import expenses from '../../repositories/expenses'
 import gains from '../../repositories/gains'
 import listOfMonths from "../../utils/months";
+import MessageBox from "../../Components/MessageBox";
 import WalletBox from "../../Components/WalletBox";
+import happyImg from "../../assets/happy.svg";
+import sadImg from "../../assets/sad.svg";
 import {
    Container,
    Content
@@ -97,6 +100,14 @@ const Dashboard : React.FC = () => {
               icon="arrowDown"
             />
             
+            <MessageBox
+                title="Muito bem!"
+                description="Sua carteira esta positiva!"
+                footerText="Continue assim. Considere investir o seu saldo"
+                icon={happyImg}
+            />
+
+
            </Content>
         </Container>
     );
